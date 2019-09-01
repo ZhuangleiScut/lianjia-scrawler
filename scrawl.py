@@ -31,7 +31,7 @@ if __name__ == "__main__":
     根据行政区来爬虫在售房源信息， 返回regionlist里面所有在售房源信息。
     由于链家限制，仅支持爬前100页数据，可使用GetHouseByCommunitylist。
     """
-    # core.GetHouseByRegionlist(city, regionlist)
+    core.GetHouseByRegionlist(city, regionlist)
 
     """
     获取行政区在租房源信息
