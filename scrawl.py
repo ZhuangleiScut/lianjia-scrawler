@@ -31,7 +31,7 @@ if __name__ == "__main__":
     根据行政区来爬虫在售房源信息， 返回regionlist里面所有在售房源信息。
     由于链家限制，仅支持爬前100页数据，可使用GetHouseByCommunitylist。
     """
-    core.GetHouseByRegionlist(city, regionlist)
+    # core.GetHouseByRegionlist(city, regionlist)
 
     """
     获取行政区在租房源信息
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     获取行政区内小区信息，可以只运行一次即可。
     """
     # Init,scrapy celllist and insert database; could run only 1st time
-    core.GetCommunityByRegionlist(city, regionlist)  # 根据行政区列表获取小区信息
+    # core.GetCommunityByRegionlist(city, regionlist)  # 根据行政区列表获取小区信息
 
     """
     根据小区来爬虫成交房源信息，返回communitylist里面所有成交房源信息。
@@ -50,5 +50,8 @@ if __name__ == "__main__":
     """
 
     communitylist = get_communitylist(city)
-    core.GetHouseByCommunitylist(city, communitylist)
-    core.GetSellByCommunitylist(city, communitylist)    # 成交房源信息
+    print(communitylist)
+
+    list = ['东荟城','金色梦想']
+    # core.GetHouseByCommunitylist(city, list)
+    core.GetSellByCommunitylist(city, list)    # 成交房源信息

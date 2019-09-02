@@ -55,12 +55,17 @@ def GetRentByCommunitylist(city, communitylist):
     logging.info("Run time: " + str(endtime - starttime))
 
 
+"""
+    获取行政区的小区信息
+"""
+
+
 def GetCommunityByRegionlist(city, regionlist=[u'huangpu']):
     logging.info("Get Community Infomation")
     starttime = datetime.datetime.now()
     for regionname in regionlist:
         try:
-            get_community_perregion(city, regionname)
+            get_community_perregion(city, regionname)  # 根据行政区获取小区信息。
             logging.info(regionname + "Done")
         except Exception as e:
             logging.error(e)
@@ -68,6 +73,11 @@ def GetCommunityByRegionlist(city, regionlist=[u'huangpu']):
             pass
     endtime = datetime.datetime.now()
     logging.info("Run time: " + str(endtime - starttime))
+
+
+"""
+    获取行政区在售房源
+"""
 
 
 def GetHouseByRegionlist(city, regionlist=[u'huangpu']):
@@ -99,7 +109,7 @@ def GetRentByRegionlist(city, regionlist=[u'huangpu']):
 def get_house_percommunity(city, communityname):
     baseUrl = u"http://%s.lianjia.com/" % (city)
     url = baseUrl + u"ershoufang/rs" + \
-        urllib.request.quote(communityname.encode('utf8')) + "/"
+          urllib.request.quote(communityname.encode('utf8')) + "/"
     source_code = misc.get_source_code(url)
     soup = BeautifulSoup(source_code, 'lxml')
 
@@ -114,8 +124,8 @@ def get_house_percommunity(city, communityname):
     for page in range(total_pages):
         if page > 0:
             url_page = baseUrl + \
-                u"ershoufang/pg%drs%s/" % (page,
-                                           urllib.request.quote(communityname.encode('utf8')))
+                       u"ershoufang/pg%drs%s/" % (page,
+                                                  urllib.request.quote(communityname.encode('utf8')))
             source_code = misc.get_source_code(url_page)
             soup = BeautifulSoup(source_code, 'lxml')
 
@@ -166,7 +176,7 @@ def get_house_percommunity(city, communityname):
             hisprice_data_source.append(
                 {"houseID": info_dict["houseID"], "totalPrice": info_dict["totalPrice"]})
             # model.Houseinfo.insert(**info_dict).upsert().execute()
-            #model.Hisprice.insert(houseID=info_dict['houseID'], totalPrice=info_dict['totalPrice']).upsert().execute()
+            # model.Hisprice.insert(houseID=info_dict['houseID'], totalPrice=info_dict['totalPrice']).upsert().execute()
 
         with model.database.atomic():
             if data_source:
@@ -180,7 +190,7 @@ def get_house_percommunity(city, communityname):
 def get_sell_percommunity(city, communityname):
     baseUrl = u"http://%s.lianjia.com/" % (city)
     url = baseUrl + u"chengjiao/rs" + \
-        urllib.request.quote(communityname.encode('utf8')) + "/"
+          urllib.request.quote(communityname.encode('utf8')) + "/"
     source_code = misc.get_source_code(url)
     soup = BeautifulSoup(source_code, 'lxml')
 
@@ -195,8 +205,8 @@ def get_sell_percommunity(city, communityname):
     for page in range(total_pages):
         if page > 0:
             url_page = baseUrl + \
-                u"chengjiao/pg%drs%s/" % (page,
-                                          urllib.request.quote(communityname.encode('utf8')))
+                       u"chengjiao/pg%drs%s/" % (page,
+                                                 urllib.request.quote(communityname.encode('utf8')))
             source_code = misc.get_source_code(url_page)
             soup = BeautifulSoup(source_code, 'lxml')
 
@@ -270,7 +280,7 @@ def get_sell_percommunity(city, communityname):
 
 def get_community_perregion(city, regionname=u'huangpu'):
     baseUrl = u"http://%s.lianjia.com/" % (city)
-    url = baseUrl + u"xiaoqu/" + regionname + "/"
+    url = baseUrl + u"xiaoqu/rs" + regionname + "/"
     source_code = misc.get_source_code(url)
     soup = BeautifulSoup(source_code, 'lxml')
 
@@ -284,7 +294,8 @@ def get_community_perregion(city, regionname=u'huangpu'):
 
     for page in range(total_pages):
         if page > 0:
-            url_page = baseUrl + u"xiaoqu/" + regionname + "/pg%d/" % page
+            url_page = baseUrl + u"xiaoqu/pg%drs" % page + regionname + "/"
+            # print(url_page)
             source_code = misc.get_source_code(url_page)
             soup = BeautifulSoup(source_code, 'lxml')
 
@@ -299,6 +310,7 @@ def get_community_perregion(city, regionname=u'huangpu'):
             try:
                 communitytitle = name.find("div", {"class": "title"})
                 title = communitytitle.get_text().strip('\n')
+                print(title)
                 link = communitytitle.a.get('href')
                 info_dict.update({u'title': title})
                 info_dict.update({u'link': link})
@@ -326,15 +338,17 @@ def get_community_perregion(city, regionname=u'huangpu'):
                 info_dict.update({u'price': price.span.get_text().strip('\n')})
 
                 communityinfo = get_communityinfo_by_url(link)
-                for key, value in communityinfo.iteritems():
+                for key, value in communityinfo.items():
                     info_dict.update({key: value})
 
                 info_dict.update({u'city': city})
-            except:
+            except Exception as err:
+                print(err)
                 continue
             # communityinfo insert into mysql
             data_source.append(info_dict)
             # model.Community.insert(**info_dict).upsert().execute()
+        # print(info_dict)
         with model.database.atomic():
             if data_source:
                 model.Community.insert_many(data_source).upsert().execute()
@@ -344,7 +358,7 @@ def get_community_perregion(city, regionname=u'huangpu'):
 def get_rent_percommunity(city, communityname):
     baseUrl = u"http://%s.lianjia.com/" % (city)
     url = baseUrl + u"zufang/rs" + \
-        quote(communityname.encode('utf8')) + "/"
+          quote(communityname.encode('utf8')) + "/"
     source_code = misc.get_source_code(url)
     soup = BeautifulSoup(source_code, 'lxml')
 
@@ -359,8 +373,8 @@ def get_rent_percommunity(city, communityname):
     for page in range(total_pages):
         if page > 0:
             url_page = baseUrl + \
-                u"rent/pg%drs%s/" % (page,
-                                     quote(communityname.encode('utf8')))
+                       u"rent/pg%drs%s/" % (page,
+                                            quote(communityname.encode('utf8')))
             source_code = misc.get_source_code(url_page)
             soup = BeautifulSoup(source_code, 'lxml')
         i = 0
@@ -429,9 +443,14 @@ def get_rent_percommunity(city, communityname):
         time.sleep(1)
 
 
+"""
+按每个行政区获取在售房源
+"""
+
+
 def get_house_perregion(city, district):
     baseUrl = u"http://%s.lianjia.com/" % (city)
-    url = baseUrl + u"ershoufang/%s/" % district
+    url = baseUrl + u"ershoufang/rs%s/" % (district)
     source_code = misc.get_source_code(url)
     soup = BeautifulSoup(source_code, 'lxml')
     if check_block(soup):
@@ -443,19 +462,19 @@ def get_house_perregion(city, district):
 
     for page in range(total_pages):
         if page > 0:
-            url_page = baseUrl + u"ershoufang/%s/pg%d/" % (district, page)
+            url_page = baseUrl + u"ershoufang/rs%s/pg%d/" % (district, page)
             source_code = misc.get_source_code(url_page)
             soup = BeautifulSoup(source_code, 'lxml')
         i = 0
         log_progress("GetHouseByRegionlist", district, page + 1, total_pages)
         data_source = []
-        hisprice_data_source = []
+        hisprice_data_source = []  # 记录历史价格
         for ultag in soup.findAll("ul", {"class": "sellListContent"}):
             for name in ultag.find_all('li'):
                 i = i + 1
                 info_dict = {}
                 try:
-                    housetitle = name.find("div", {"class": "title"})
+                    housetitle = name.find("div", {"class": "title"})  # 名称
                     info_dict.update(
                         {u'title': housetitle.a.get_text().strip()})
                     info_dict.update({u'link': housetitle.a.get('href')})
@@ -470,6 +489,7 @@ def get_house_perregion(city, district):
                     info_dict.update({u'direction': info[3]})
                     info_dict.update({u'decoration': info[4]})
 
+                    # 楼层信息
                     housefloor = name.find("div", {"class": "positionInfo"})
                     info_dict.update({u'years': housefloor.get_text().strip()})
                     info_dict.update({u'floor': housefloor.get_text().strip()})
@@ -478,12 +498,17 @@ def get_house_perregion(city, district):
                     info_dict.update(
                         {u'followInfo': followInfo.get_text().strip()})
 
+                    # 是否满5年
                     taxfree = name.find("span", {"class": "taxfree"})
-                    if taxfree == None:
-                        info_dict.update({u"taxtype": ""})
-                    else:
+                    five = name.find("span", {"class": "five"})
+                    if taxfree is not None:
                         info_dict.update(
                             {u"taxtype": taxfree.get_text().strip()})
+                    elif five is not None:
+                        info_dict.update(
+                            {u"taxtype": five.get_text().strip()})
+                    else:
+                        info_dict.update({u"taxtype": ""})
 
                     totalPrice = name.find("div", {"class": "totalPrice"})
                     info_dict.update(
@@ -500,7 +525,7 @@ def get_house_perregion(city, district):
                 hisprice_data_source.append(
                     {"houseID": info_dict["houseID"], "totalPrice": info_dict["totalPrice"]})
                 # model.Houseinfo.insert(**info_dict).upsert().execute()
-                #model.Hisprice.insert(houseID=info_dict['houseID'], totalPrice=info_dict['totalPrice']).upsert().execute()
+                # model.Hisprice.insert(houseID=info_dict['houseID'], totalPrice=info_dict['totalPrice']).upsert().execute()
 
         with model.database.atomic():
             if data_source:
@@ -513,7 +538,7 @@ def get_house_perregion(city, district):
 
 def get_rent_perregion(city, district):
     baseUrl = u"http://%s.lianjia.com/" % (city)
-    url = baseUrl + u"zufang/%s/" % district
+    url = baseUrl + u"zufang/rs%s/" % district
     source_code = misc.get_source_code(url)
     soup = BeautifulSoup(source_code, 'lxml')
     if check_block(soup):
@@ -525,7 +550,7 @@ def get_rent_perregion(city, district):
 
     for page in range(total_pages):
         if page > 0:
-            url_page = baseUrl + u"zufang/%s/pg%d/" % (district, page)
+            url_page = baseUrl + u"zufang/rs%s/pg%d/" % (district, page)
             source_code = misc.get_source_code(url_page)
             soup = BeautifulSoup(source_code, 'lxml')
         i = 0
