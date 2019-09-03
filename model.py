@@ -59,7 +59,7 @@ class Community(BaseModel):
 
 
 class Houseinfo(BaseModel):
-    houseID = CharField(primary_key=True)
+    id = CharField(primary_key=True)
     title = CharField()
     link = CharField()
     community = CharField()
@@ -77,16 +77,16 @@ class Houseinfo(BaseModel):
 
 
 class Hisprice(BaseModel):
-    houseID = CharField()
+    id = CharField()
     totalPrice = CharField()
     date = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
-        primary_key = CompositeKey('houseID', 'totalPrice')
+        primary_key = CompositeKey('id', 'totalPrice')
 
 
 class Sellinfo(BaseModel):
-    houseID = CharField(primary_key=True)
+    id = CharField(primary_key=True)
     title = CharField()
     link = CharField()
     community = CharField()
@@ -104,7 +104,7 @@ class Sellinfo(BaseModel):
 
 
 class Rentinfo(BaseModel):
-    houseID = CharField(primary_key=True)
+    id = CharField(primary_key=True)
     title = CharField()
     link = CharField()
     region = CharField()

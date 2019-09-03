@@ -168,13 +168,13 @@ def get_house_percommunity(city, communityname):
 
                 unitPrice = name.find("div", {"class": "unitPrice"})
                 info_dict.update({u'unitPrice': unitPrice.get('data-price')})
-                info_dict.update({u'houseID': unitPrice.get('data-hid')})
+                info_dict.update({u'id': unitPrice.get('data-hid')})
             except:
                 continue
             # houseinfo insert into mysql
             data_source.append(info_dict)
             hisprice_data_source.append(
-                {"houseID": info_dict["houseID"], "totalPrice": info_dict["totalPrice"]})
+                {"id": info_dict["id"], "totalPrice": info_dict["totalPrice"]})
             # model.Houseinfo.insert(**info_dict).upsert().execute()
             # model.Hisprice.insert(houseID=info_dict['houseID'], totalPrice=info_dict['totalPrice']).upsert().execute()
 
@@ -222,7 +222,7 @@ def get_sell_percommunity(city, communityname):
                     info_dict.update({u'link': housetitle.a.get('href')})
                     houseID = housetitle.a.get(
                         'href').split("/")[-1].split(".")[0]
-                    info_dict.update({u'houseID': houseID.strip()})
+                    info_dict.update({u'id': houseID.strip()})
 
                     house = housetitle.get_text().strip().split(' ')
                     info_dict.update({u'community': communityname})
@@ -391,7 +391,7 @@ def get_rent_percommunity(city, communityname):
                     info_dict.update({u'link': housetitle.a.get('href')})
                     houseID = housetitle.a.get(
                         'href').split("/")[-1].split(".")[0]
-                    info_dict.update({u'houseID': houseID})
+                    info_dict.update({u'id': houseID})
 
                     region = name.find("span", {"class": "region"})
                     info_dict.update({u'region': region.get_text().strip()})
@@ -479,7 +479,7 @@ def get_house_perregion(city, district):
                         {u'title': housetitle.a.get_text().strip()})
                     info_dict.update({u'link': housetitle.a.get('href')})
                     houseID = housetitle.a.get('data-housecode')
-                    info_dict.update({u'houseID': houseID})
+                    info_dict.update({u'id': houseID})
 
                     houseinfo = name.find("div", {"class": "houseInfo"})
                     info = houseinfo.get_text().split('|')
@@ -523,7 +523,7 @@ def get_house_perregion(city, district):
                 # Houseinfo insert into mysql
                 data_source.append(info_dict)
                 hisprice_data_source.append(
-                    {"houseID": info_dict["houseID"], "totalPrice": info_dict["totalPrice"]})
+                    {"id": info_dict["id"], "totalPrice": info_dict["totalPrice"]})
                 # model.Houseinfo.insert(**info_dict).upsert().execute()
                 # model.Hisprice.insert(houseID=info_dict['houseID'], totalPrice=info_dict['totalPrice']).upsert().execute()
 
@@ -566,7 +566,7 @@ def get_rent_perregion(city, district):
                         {u'title': housetitle.h2.a.get_text().strip()})
                     info_dict.update({u'link': housetitle.a.get("href")})
                     houseID = name.get("data-housecode")
-                    info_dict.update({u'houseID': houseID})
+                    info_dict.update({u'id': houseID})
 
                     region = name.find("span", {"class": "region"})
                     info_dict.update({u'region': region.get_text().strip()})
